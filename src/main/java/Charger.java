@@ -22,8 +22,10 @@ public class Charger {
                 break;
             case 2:
                 this.ch=chargers.CHADEMO;
+                break;
             case 3:
                 this.ch=chargers.COMBO_CHARGER_SYSTEM;
+                break;
             case 4:
                 this.ch=chargers.SUPER_CHARGER;
                 break;
