@@ -3,7 +3,14 @@ import java.time.LocalTime;
 public class CustomerScheduledData {
     int CUSTMOER_ID;
     LocalTime PREFER_START_TIME,PREFER_FINISH_TIME;
-    ChargerScheduled ASSIGNED_CHARGER;
+    Charger ASSIGNED_CHARGER;
+     @Override
+    public String toString() {
+        return "Id-: "+getCUSTMOER_ID() +" Start Time: "+getPREFER_START_TIME()
+                      +" Finish Time: "+getPREFER_FINISH_TIME()
+                      +" Charger: "+getASSIGNED_CHARGER()
+                      +" Duration: "+getChargingDuration();
+    }
 
     public int getCUSTMOER_ID() {
         return CUSTMOER_ID;
@@ -14,11 +21,11 @@ public class CustomerScheduledData {
     }
 
 
-    public ChargerScheduled getASSIGNED_CHARGER() {
+    public Charger getASSIGNED_CHARGER() {
         return ASSIGNED_CHARGER;
     }
 
-    public void setASSIGNED_CHARGER(ChargerScheduled ASSIGNED_CHARGER) {
+    public void setASSIGNED_CHARGER(Charger ASSIGNED_CHARGER) {
         this.ASSIGNED_CHARGER = ASSIGNED_CHARGER;
     }
 

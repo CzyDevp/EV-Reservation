@@ -1,7 +1,7 @@
 public class DataObjectEVCompatibility {
 	private Customer.EV_CAR Car_Type;
 	private Charger.chargers Charging_Point_Name;
-	private double milePerminute = -1;
+	private double miles_Perminute = -1;
 	public DataObjectEVCompatibility() {
 		// TODO Auto-generated constructor stub
 	}
@@ -9,7 +9,7 @@ public class DataObjectEVCompatibility {
 		super();
 		this.Charging_Point_Name = chargingPointName;
 		this.Car_Type = evCarType;
-		this.milePerminute = milePerminute;
+		this.miles_Perminute = milePerminute;
 	}
 	public Customer.EV_CAR getCar_Type() {
 		return Car_Type;
@@ -24,9 +24,9 @@ public class DataObjectEVCompatibility {
 		Charging_Point_Name = charging_Point_Name;
 	}
 	public double getMilePerminute() {
-		return milePerminute;
+		return miles_Perminute;
 	}
-	public void setMilePerminute(double milePerminute) {
-		this.milePerminute = milePerminute;
+	public void setMilePerminute(int milePerminute) {
+		this.miles_Perminute = milePerminute;
 	}
 }

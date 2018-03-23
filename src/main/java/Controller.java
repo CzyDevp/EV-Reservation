@@ -5,27 +5,24 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jfree.ui.RefineryUtilities;
+import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 public class Controller {
     List<Customer> customersRequests = new ArrayList<>();
     List<Charger> chargers = new ArrayList<>();
     int ROWS_TOTAL_CHARGER=0, ROWS_TOTAL_CUSTOMER=0;
-    List<Customer>CUST_NISSAN,CUST_CHEV,CUST_TESLA;
-    List<Charger>LEVEL_2,CHADEMO,COMBO,SUPER_CHARGER;
     List<DataObjectEVCompatibility>EV_COMPATIBILITY_DEFAULT;
-    List<CustomerScheduledData>CUSTOMER_SCHEDULED;
+    static List<CustomerScheduledData>CUSTOMER_SCHEDULED;
     @FXML
     private Button getDataSet;
     String filename;
@@ -60,7 +57,8 @@ public class Controller {
         System.out.println("Total Number of Chargers available are : "+(ROWS_TOTAL_CHARGER-1));
         Iterator<Row> CHARGER_Iterator = Charger_Sheet.iterator();
         Iterator<Row> iterator = sheet.iterator();
-        //******************************************Charger reading***************************************************\\
+
+        //******************************************Charger reading Start**********************************************\\
         while (CHARGER_Iterator.hasNext()) {
             Charger charger = new Charger();
             Row currentRow = CHARGER_Iterator.next();
@@ -84,8 +82,9 @@ public class Controller {
                 chargers.add(charger);
             }
         }
-    //********************************************************Charger reading*****************************************\\
-    //********************************************************Customer reading*****************************************\\
+    //********************************************************Charger reading Done*************************************\\
+
+    //*************************************************Customer reading Start *****************************************\\
         while (iterator.hasNext()) {
             Customer customer = new Customer();
             Row currentRow = iterator.next();
@@ -100,7 +99,7 @@ public class Controller {
                             customer.setCUSTOMER_ID((int) currentCell.getNumericCellValue());   //customer id
                         }
                         if (currentCell.getColumnIndex() == 3) {
-                            customer.setMILES(currentCell.getNumericCellValue()); //miles
+                            customer.setMILES((int)currentCell.getNumericCellValue()); //miles
                         }
                         if (currentCell.getColumnIndex() == 4) {
 
@@ -124,59 +123,109 @@ public class Controller {
                 }
                 customersRequests.add(customer);
             }
+    //*************************************************Customer reading Done  *****************************************\\
         }
-    //********************************************************Customer reading*****************************************\\
-        System.out.println("Available Chargers are : ");
-        chargers.stream().map(Charger::toString).forEach(System.out::println);
-        System.out.println("Customer Requests for Chargers are: "+ customersRequests.size());
-        customersRequests.stream().map(Customer::toString).forEach(System.out::println);
-
-        //********************************************Customer filtering based on EV-TYPE******************************\\
-        //**Nissan EV'S
-        System.out.println("\n\n\n*******************Nissan EV's***********************");
-        CUST_NISSAN = customersRequests.stream()
-                      .filter(customer -> customer.getEv_car().equals(Customer.EV_CAR.NISSAN))
-                       .collect(Collectors.toList());
-        CUST_NISSAN.forEach(System.out::println);
-        //**Chev EV's
-        System.out.println("\n\n*******************Chev EV's***********************");
-        CUST_CHEV = customersRequests.stream()
-                    .filter(customer -> customer.getEv_car().equals(Customer.EV_CAR.CHEV))
-                    .collect(Collectors.toList());
-        CUST_CHEV.forEach(System.out::println);
-        //**Tesla EV's
-        System.out.println("\n\n*******************Tesla EV's***********************");
-        CUST_TESLA = customersRequests.stream()
-                     .filter(customer -> customer.getEv_car().equals(Customer.EV_CAR.TESLA))
-                     .collect(Collectors.toList());
-        CUST_TESLA.forEach(System.out::println);
-
-        //********************************************CHARGER filtering based on CHARGER-TYPE******************************\\
-        System.out.println("\n\n*******************LEVEL_2***********************");
-        LEVEL_2 = chargers.stream()
-                  .filter(charger -> charger.getCh().equals(Charger.chargers.LEVEL_2))
-                  .collect(Collectors.toList());
-        LEVEL_2.forEach(System.out::println);
-        System.out.println("\n\n*******************CHADEMO***********************");
-        CHADEMO = chargers.stream()
-                .filter(charger -> charger.getCh().equals(Charger.chargers.CHADEMO))
-                .collect(Collectors.toList());
-        CHADEMO.forEach(System.out::println);
-        System.out.println("\n\n*******************COMBO***********************");
-        COMBO=chargers.stream()
-                .filter(charger -> charger.getCh().equals(Charger.chargers.COMBO_CHARGER_SYSTEM))
-                .collect(Collectors.toList());
-        COMBO.forEach(System.out::println);
-        System.out.println("\n\n*******************SUPER_CHARGER***********************");
-        SUPER_CHARGER =chargers.stream()
-                .filter(charger -> charger.getCh().equals(Charger.chargers.SUPER_CHARGER))
-                .collect(Collectors.toList());
-        SUPER_CHARGER.forEach(System.out::println);
-        //DEFAULT_COMPATABILITY_CALL
+     //**************************************************DEFAULT_COMPATABILITY_CALL*************************************\\
         defaultCompatibility();
-        //getev
-       getCharger();
+    //*****************************************************getValidCstomers********************************************\\
+        //System.out.println("\n\nValid Customer Requests Are : ");
+        //getValidRangeCustomers().forEach(System.out::println);
+    //******************************************************Scheduled Customers****************************************\\
+        scheduleCustomer();
+        System.out.println("\n\nScheduled Customer Requests Are : ");
+        CUSTOMER_SCHEDULED.stream().map(CustomerScheduledData::toString).forEach(System.out::println);
+        int count = customersRequests.size();
+        if (count > 0) {
+            // Draw Chart
+            JFrame demo = new GanttChartView("EV Car Scheduler - Gantt Chart");
+            demo.pack();
+            RefineryUtilities.centerFrameOnScreen(demo);
+            demo.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            demo.setLocationRelativeTo(null);
+            demo.setVisible(true);
+            demo.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        }
+
+        //*******************************************Write Output to Excel FIle********************************************\\
+      WriteExcelFileExample.getInstance().writeStudentsListToExcel(CUSTOMER_SCHEDULED);
     }
+
+    //*******************************************Schedule Customer****************************************************\\
+    private void scheduleCustomer(){
+        CUSTOMER_SCHEDULED= new ArrayList<>();
+        List<Customer> VALID_Cust=getValidRangeCustomers();
+        CustomerScheduledData scheduledCustomer;
+        for(Customer customer:customersRequests){
+            Charger chargerScheduled = getCharger(customer);
+            if(chargerScheduled!=null){
+                scheduledCustomer=new CustomerScheduledData();
+                scheduledCustomer.setCUSTMOER_ID(customer.getCUSTOMER_ID());
+                scheduledCustomer.setPREFER_START_TIME(customer.getPREFER_START_TIME());
+                scheduledCustomer.setPREFER_FINISH_TIME(customer.getPREFER_END_TIME());
+                scheduledCustomer.setASSIGNED_CHARGER(chargerScheduled);
+                CUSTOMER_SCHEDULED.add(scheduledCustomer);
+            }
+        }
+    }
+
+
+    //**********************************FIND_COMPATIBLE***************************************************************\\
+    private Charger getCharger(Customer customer){
+        Charger ch=null;
+        for(DataObjectEVCompatibility dataObjectEVCompatibility:EV_COMPATIBILITY_DEFAULT){
+            if(dataObjectEVCompatibility.getCar_Type().equals(customer.getCAR_TYPE())
+                    && (dataObjectEVCompatibility.getMilePerminute()*customer.getTimeInMinutes())>=customer.getMILES()
+                        ){
+                int projectedTotalMinutes= (int) ((int)customer.getMILES() / dataObjectEVCompatibility.getMilePerminute());
+                int totalMinutes = customer.getPREFER_START_TIME().getMinute()+projectedTotalMinutes;
+                System.out.println("ID "+customer.getCUSTOMER_ID()+" Car-Type "+customer.getCAR_TYPE()+" Customer's minutes "+ customer.getTimeInMinutes());
+                System.out.println("Total Minutes "+totalMinutes);
+                LocalTime projectedFinishTime = getProjectedTime(totalMinutes,customer.getPREFER_START_TIME());
+                System.out.println("Projected Finish Times is "+projectedFinishTime + " With Charger "+dataObjectEVCompatibility.getCharging_Point_Name());
+                    for (Charger charger : chargers) {
+                        if (charger.getCh().equals(dataObjectEVCompatibility.getCharging_Point_Name())) {
+                            boolean isSpaceAvailable = true;
+                            for (CustomerScheduledData c : CUSTOMER_SCHEDULED) {
+                                if (c.getASSIGNED_CHARGER().equals(charger)) {
+                                    if (c.getPREFER_FINISH_TIME().isAfter(customer.getPREFER_START_TIME())) {
+                                        isSpaceAvailable = false;
+                                    } else if (projectedFinishTime.isBefore(c.PREFER_START_TIME)) {
+                                        // isSpaceAvailable=true;
+                                        customer.setPREFER_END_TIME(projectedFinishTime);
+                                        return charger;
+                                    }
+
+                                }
+                            }
+                            if (isSpaceAvailable) {
+                                customer.setPREFER_END_TIME(projectedFinishTime);
+                                return charger;
+                            }
+
+                        }
+                    }
+                }
+
+
+        }
+
+        return  ch;
+    }
+
+    //***********************************get projected Time***********************************************************\\
+    private LocalTime getProjectedTime(int totalMinutes,LocalTime prefferedStartTime){
+        int minutes=0, hour=0;
+        if(totalMinutes>59){
+            minutes= totalMinutes%60;
+            hour = totalMinutes/60;
+        }
+        else{
+            minutes=totalMinutes;
+        }
+        return prefferedStartTime.plusHours(hour).plusMinutes(minutes);
+    }
+
+    //**********************************Intailize Default Chargers****************************************************\\
 
     private void defaultCompatibility() {
         EV_COMPATIBILITY_DEFAULT = new ArrayList<>();
@@ -192,48 +241,26 @@ public class Controller {
         EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA, Charger.chargers.SUPER_CHARGER, 2.67));
 
     }
-    //**********************************FIND_COMPATIBLE***************************************************************\\
-    private ChargerScheduled getCharger(){
-            //CUSTOMER_SCHEDULED= new ArrayList<>();
-            customersRequests.stream().forEach(customer -> {
-            EV_COMPATIBILITY_DEFAULT.stream().forEach(dataObjectEVCompatibility -> {
-                if((dataObjectEVCompatibility.getCar_Type().equals(customer.getEv_car()))
-                    && dataObjectEVCompatibility.getMilePerminute()*customer.getTimeInMinutes()>=customer.getMILES() ){
-                    System.out.println("Customer's minutes "+ customer.getTimeInMinutes());
-                    int preferredFinisTime= (int) (customer.getMILES() / dataObjectEVCompatibility.getMilePerminute());
-                    int totalMinutes = customer.getPREFER_START_TIME().getMinute()+preferredFinisTime;
 
-                    //*******************finis time calcultion********************
-                    int minutes=0, hour=0;
-                    if(totalMinutes>59){
-                       minutes= totalMinutes%60;
-                       hour = totalMinutes/60;
+
+    //**********************************Valid Customers Based on Miles************************************************\\
+    private List<Customer> getValidRangeCustomers(){
+        List<Customer> VALID_CUSTOMERS=new ArrayList<>();
+        for(Customer customer:customersRequests){
+            for(DataObjectEVCompatibility dataObjectEVCompatibility: EV_COMPATIBILITY_DEFAULT){
+                if((dataObjectEVCompatibility.getCar_Type().equals(customer.getCAR_TYPE()))
+                        && (((dataObjectEVCompatibility.getMilePerminute())*(customer.getTimeInMinutes()))>=customer.getMILES())){
+                    int projectedTotalMinutes= (int) ((int)customer.getMILES() / dataObjectEVCompatibility.getMilePerminute());
+                    int totalMinutes = customer.getPREFER_START_TIME().getMinute()+projectedTotalMinutes;
+                    LocalTime projectedFinishTime = getProjectedTime(totalMinutes,customer.getPREFER_START_TIME());
+                    if(projectedFinishTime.isBefore(customer.PREFER_END_TIME)) {
+                                       VALID_CUSTOMERS.add(customer);
                     }
-                    else{
-                          minutes=totalMinutes;
-                    }
-                    LocalTime finishTim = customer.getPREFER_START_TIME().plusHours(hour).plusMinutes(minutes);
-//                    if((finishTim.isBefore(customer.getPREFER_END_TIME()))
-//                         &&(finishTim.isAfter(customer.getPREFER_START_TIME()))){
-//                        CustomerScheduledData customerScheduledData = new CustomerScheduledData();
-//                        customerScheduledData.setCUSTMOER_ID(customer.getCUSTOMER_ID());
-//                        customerScheduledData.setPREFER_FINISH_TIME(finishTim);
-//                        customerScheduledData.setPREFER_START_TIME(customer.getPREFER_START_TIME());
-//
-//                        CUSTOMER_SCHEDULED.add();
-//                    }
-                    System.out.println("Finish Times is "+finishTim);
-
-                    //*******************finis time calcultion********************
-
                 }
-            });
-           });
-            return  null;
+            }
+
+        }
+        return VALID_CUSTOMERS.stream().collect(Collectors.toList());
     }
 
-    private void scheduleCustomer(){
-        CUSTOMER_SCHEDULED= new ArrayList<>();
-
-    }
 }

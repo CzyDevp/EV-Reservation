@@ -35,7 +35,7 @@ public class Charger {
     public String toString() {
 
         return "Charger-ID-: "+ getCHARGING_POINT_ID()
-                +" Charger-Type-: "+getCh();
+                +" "+getCh();
 
     }
 }

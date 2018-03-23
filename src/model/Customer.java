@@ -1,9 +1,9 @@
 import java.time.LocalTime;
 public class Customer {
     int CUSTOMER_ID;
-    double MILES;
+    int MILES;
     LocalTime PREFER_START_TIME,PREFER_END_TIME;
-    EV_CAR ev_car;
+    EV_CAR CAR_TYPE;
     public int getCUSTOMER_ID() {
         return CUSTOMER_ID;
     }
@@ -13,13 +13,13 @@ public class Customer {
     public double getMILES() {
         return MILES;
     }
-    public void setMILES(double MILES) {
+    public void setMILES(int MILES) {
         this.MILES = MILES;
     }
     @Override
     public String toString() {
         return "Customer is Id-: "+ getCUSTOMER_ID()
-                                  +" EV_Type-: "+getEv_car()+"  Miles-: "
+                                  +" EV_Type-: "+getCAR_TYPE()+"  Miles-: "
                                   +getMILES()+" init_time-: "
                                   +getPREFER_START_TIME()+" e_time-: "
                                   +getPREFER_END_TIME() ;
@@ -36,19 +36,19 @@ public class Customer {
     public void setPREFER_END_TIME(LocalTime PREFER_END_TIME) {
         this.PREFER_END_TIME = PREFER_END_TIME;
     }
-    public EV_CAR getEv_car() {
-        return ev_car;
+    public EV_CAR getCAR_TYPE() {
+        return CAR_TYPE;
     }
     public void setEv_car(int EV_TYPE) {
         switch (EV_TYPE){
             case 1:
-                this.ev_car =EV_CAR.NISSAN;
+                this.CAR_TYPE =EV_CAR.NISSAN;
                 break;
             case 2:
-                this.ev_car=EV_CAR.CHEV;
+                this.CAR_TYPE=EV_CAR.CHEV;
                 break;
             case 3:
-                this.ev_car=EV_CAR.TESLA;
+                this.CAR_TYPE=EV_CAR.TESLA;
                 break;
         }
 
