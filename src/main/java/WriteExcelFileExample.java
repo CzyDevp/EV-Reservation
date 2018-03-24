@@ -39,7 +39,7 @@ public class WriteExcelFileExample {
             row.createCell(cellIndex++).setCellValue(c.getChargingDuration());
 
             //fifth place in row is charger
-            row.createCell(cellIndex++).setCellValue(c.getASSIGNED_CHARGER().CHARGING_POINT_ID);
+            row.createCell(cellIndex++).setCellValue(c.getASSIGNED_CHARGER().C_P_Id);
 
         }
         //write this workbook in excel file.

@@ -1,11 +1,11 @@
 public class Charger {
-    int CHARGING_POINT_ID;
+    int C_P_Id;
     chargers ch;
-    public int getCHARGING_POINT_ID() {
-        return CHARGING_POINT_ID;
+    public int getC_P_Id() {
+        return C_P_Id;
     }
-    public void setCHARGING_POINT_ID(int CHARGING_POINT_ID) {
-        this.CHARGING_POINT_ID = CHARGING_POINT_ID;
+    public void setC_P_Id(int c_P_Id) {
+        this.C_P_Id = c_P_Id;
     }
     public chargers getCh() {
         return ch;
@@ -13,29 +13,30 @@ public class Charger {
     public void setCh(int CHARGER_TYPE) {
         switch(CHARGER_TYPE){
             case 1:
-                this.ch=chargers.LEVEL_2;
+                this.ch=chargers.LVL_2;
                 break;
             case 2:
-                this.ch=chargers.CHADEMO;
+                this.ch=chargers.CHDM;
                 break;
             case 3:
-                this.ch=chargers.COMBO_CHARGER_SYSTEM;
+                this.ch=chargers.C_C_S;
                 break;
             case 4:
-                this.ch=chargers.SUPER_CHARGER;
+                this.ch=chargers.S_C;
                 break;
         }
 
     }
 
     enum chargers{
-        LEVEL_2,SUPER_CHARGER,CHADEMO,COMBO_CHARGER_SYSTEM;
+        LVL_2, S_C, CHDM, C_C_S;
     }
     @Override
     public String toString() {
 
-        return "Charger-ID-: "+ getCHARGING_POINT_ID()
+        return "Charger-ID-: "+ getC_P_Id()
                 +" "+getCh();
 
     }
+
 }

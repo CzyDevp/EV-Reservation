@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 public class Controller {
     List<Customer> customersRequests = new ArrayList<>();
-    List<Charger> chargers = new ArrayList<>();
+    static List<Charger> chargers = new ArrayList<>();
     int ROWS_TOTAL_CHARGER=0, ROWS_TOTAL_CUSTOMER=0;
     List<DataObjectEVCompatibility>EV_COMPATIBILITY_DEFAULT;
     static List<CustomerScheduledData>CUSTOMER_SCHEDULED;
@@ -71,7 +71,7 @@ public class Controller {
                     if (currentCell.getCellTypeEnum().equals(CellType.STRING)){}
                     else if (currentCell.getCellTypeEnum().equals(CellType.NUMERIC)){
                         if (currentCell.getColumnIndex() == 0) {
-                            charger.setCHARGING_POINT_ID((int) currentCell.getNumericCellValue());   //charger id
+                            charger.setC_P_Id((int) currentCell.getNumericCellValue());   //charger id
                         }
                         if(currentCell.getColumnIndex()==1){
                             //charger.setCHARGER_TYPE((int)currentCell.getNumericCellValue());
@@ -230,15 +230,15 @@ public class Controller {
     private void defaultCompatibility() {
         EV_COMPATIBILITY_DEFAULT = new ArrayList<>();
         //************************************NISSAN***********************************\\
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.NISSAN, Charger.chargers.LEVEL_2, 0.37));
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.NISSAN, Charger.chargers.CHADEMO, 1.20));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.NISSAN, Charger.chargers.LVL_2, 0.37));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.NISSAN, Charger.chargers.CHDM, 1.20));
         //************************************CHEV***********************************\\
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.CHEV, Charger.chargers.LEVEL_2, 0.40));
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.CHEV, Charger.chargers.COMBO_CHARGER_SYSTEM, 2.20));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.CHEV, Charger.chargers.LVL_2, 0.40));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.CHEV, Charger.chargers.C_C_S, 2.20));
         //************************************TESLA***********************************\\
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA, Charger.chargers.LEVEL_2, 0.42));
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA, Charger.chargers.CHADEMO, 1.42));
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA, Charger.chargers.SUPER_CHARGER, 2.67));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA, Charger.chargers.LVL_2, 0.42));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA, Charger.chargers.CHDM, 1.42));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA, Charger.chargers.S_C, 2.67));
 
     }
 
@@ -262,5 +262,13 @@ public class Controller {
         }
         return VALID_CUSTOMERS.stream().collect(Collectors.toList());
     }
-
+    public static Charger getChargerById(int chargerid){
+        Charger charger = null;
+        for(Charger ch: chargers){
+            if(chargerid==ch.getC_P_Id()){
+                charger=ch;
+            }
+        }
+            return charger;
+    }
 }
