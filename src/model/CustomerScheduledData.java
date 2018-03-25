@@ -1,54 +1,54 @@
 import java.time.LocalTime;
 
 public class CustomerScheduledData {
-    int CUSTMOER_ID;
-    LocalTime PREFER_START_TIME,PREFER_FINISH_TIME;
-     Charger ASSIGNED_CHARGER;
+    int customer_Id;
+    LocalTime Prefer_Start_Time, Prefer_Fin_Time;
+     Charger Assigned_Charger;
      @Override
     public String toString() {
-        return "Id-: "+getCUSTMOER_ID() +" Start Time: "+getPREFER_START_TIME()
-                      +" Finish Time: "+getPREFER_FINISH_TIME()
-                      +" Charger: "+getASSIGNED_CHARGER()
+        return "Id-: "+ getCustomer_Id() +" Start Time: "+ getPrefer_Start_Time()
+                      +" Finish Time: "+ getPrefer_Fin_Time()
+                      +" Charger: "+ getAssigned_Charger()
                       +" Duration: "+getChargingDuration();
     }
 
-    public  int getCUSTMOER_ID() {
-        return CUSTMOER_ID;
+    public  int getCustomer_Id() {
+        return customer_Id;
     }
 
-    public void setCUSTMOER_ID(int CUSTMOER_ID) {
-        this.CUSTMOER_ID = CUSTMOER_ID;
+    public void setCustomer_Id(int customer_Id) {
+        this.customer_Id = customer_Id;
     }
 
 
-    public  Charger getASSIGNED_CHARGER() {
-        return ASSIGNED_CHARGER;
+    public  Charger getAssigned_Charger() {
+        return Assigned_Charger;
     }
 
-    public void setASSIGNED_CHARGER(Charger ASSIGNED_CHARGER) {
-        this.ASSIGNED_CHARGER = ASSIGNED_CHARGER;
+    public void setAssigned_Charger(Charger assigned_Charger) {
+        this.Assigned_Charger = assigned_Charger;
     }
 
-    public LocalTime getPREFER_START_TIME() {
-        return PREFER_START_TIME;
+    public LocalTime getPrefer_Start_Time() {
+        return Prefer_Start_Time;
     }
 
-    public void setPREFER_START_TIME(LocalTime PREFER_START_TIME) {
-        this.PREFER_START_TIME = PREFER_START_TIME;
+    public void setPrefer_Start_Time(LocalTime prefer_Start_Time) {
+        this.Prefer_Start_Time = prefer_Start_Time;
     }
 
-    public LocalTime getPREFER_FINISH_TIME() {
-        return PREFER_FINISH_TIME;
+    public LocalTime getPrefer_Fin_Time() {
+        return Prefer_Fin_Time;
     }
 
-    public void setPREFER_FINISH_TIME(LocalTime PREFER_FINISH_TIME) {
-        this.PREFER_FINISH_TIME = PREFER_FINISH_TIME;
+    public void setPrefer_Fin_Time(LocalTime prefer_Fin_Time) {
+        this.Prefer_Fin_Time = prefer_Fin_Time;
     }
 
      public int getChargingDuration(){
          int minutes=0;
-         int hour = PREFER_FINISH_TIME.getHour()-PREFER_START_TIME.getHour();
-         int min = PREFER_FINISH_TIME.getMinute()-PREFER_START_TIME.getMinute();
+         int hour = Prefer_Fin_Time.getHour()- Prefer_Start_Time.getHour();
+         int min = Prefer_Fin_Time.getMinute()- Prefer_Start_Time.getMinute();
          if(hour>0){
              minutes+=hour*60;
          }

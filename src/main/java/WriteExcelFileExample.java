@@ -27,25 +27,27 @@ public class WriteExcelFileExample {
             Row row = studentsSheet.createRow(rowIndex++);
             int cellIndex = 0;
             //first place in row is id
-            row.createCell(cellIndex++).setCellValue(c.getCUSTMOER_ID());
+            row.createCell(cellIndex++).setCellValue(c.getCustomer_Id());
 
             //second place in row is start-Time
-            row.createCell(cellIndex++).setCellValue(String.valueOf(c.getPREFER_START_TIME()));
+            row.createCell(cellIndex++).setCellValue(String.valueOf(c.getPrefer_Start_Time()));
 
             //third place in row is Finsih-Time
-            row.createCell(cellIndex++).setCellValue(String.valueOf(c.getPREFER_FINISH_TIME()));
+            row.createCell(cellIndex++).setCellValue(String.valueOf(c.getPrefer_Fin_Time()));
 
             //fourth place in row is Duration
             row.createCell(cellIndex++).setCellValue(c.getChargingDuration());
 
             //fifth place in row is charger
-            row.createCell(cellIndex++).setCellValue(c.getASSIGNED_CHARGER().C_P_Id);
+            row.createCell(cellIndex++).setCellValue(c.getAssigned_Charger().C_P_Id);
 
         }
         //write this workbook in excel file.
         try {
             FileOutputStream fos = new FileOutputStream(FILE_PATH);
             workbook.write(fos);
+            fos.flush();
+
             fos.close();
             System.out.println(FILE_PATH + " is successfully written");
         } catch (FileNotFoundException e) {

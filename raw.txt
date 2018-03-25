@@ -157,4 +157,78 @@ public class Controller {
         }*/
         customersRequests.stream().map(Customer::toString).forEach(System.out::println);
     }
-}
+}.
+
+
+
+
+
+
+
+
+================
+//        for(Row row: sheet){
+//            if(row.getCell(0).getCellTypeEnum().equals(CellType.STRING)){
+//                ROW_NUMBERS = row.getRowNum();
+//            }
+//        }
+       // System.out.println("Number is "+ROW_NUMBERS);
+//        for(int i=1;i<ROW_NUMBERS;i++){
+//            Customer customer = new Customer();
+//            Row r = sheet.getRow(i);
+////            System.out.println(r.getRowNum());
+//            if(r!=null) {
+//                Iterator cellIterator = r.cellIterator();
+//                while (cellIterator.hasNext()) {
+//                    Cell currentCell = (XSSFCell) cellIterator.next();
+//                    if (currentCell.getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                        if (currentCell.getColumnIndex() == 0) {
+//                            customer.setCUSTOMER_ID((int) currentCell.getNumericCellValue());   //customer id
+//                        }
+//                        if (currentCell.getColumnIndex() == 3) {
+//                            customer.setMILES(currentCell.getNumericCellValue()); //miles
+//                        }
+//                        if (currentCell.getColumnIndex() == 4) {
+//                            customer.setEV_TYPE((int) currentCell.getNumericCellValue());
+//                        }
+//                        if (DateUtil.isCellDateFormatted(currentCell)) {
+//                            if (currentCell.getColumnIndex() == 1) {
+//                                Date date = currentCell.getDateCellValue();
+//                                SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm");
+//                                // System.out.print(formatTime.format(date) + "--");
+//                                customer.setPREFER_START_TIME(formatTime.format(date));
+//                            }
+//                            if (currentCell.getColumnIndex() == 2) {
+//                                Date date = currentCell.getDateCellValue();
+//                                SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm");
+//                                //System.out.print(formatTime.format(date) + "--");
+//                                customer.setPREFER_END_TIME(formatTime.format(date));
+//                            }
+//                        }
+//                    }
+//                    // System.out.println();
+//                }
+//                customersRequests.add(customer);
+//            }
+//        }
+
+//        for(int i=ROW_NUMBERS+1;i<=sheet.getLastRowNum();i++){
+//            Charger charger = new Charger();
+//            Row row = sheet.getRow(i);
+//            if(row!=null){
+//                Iterator iterator = row.cellIterator();
+//                while(iterator.hasNext()){
+//                    Cell currentCell = (XSSFCell) iterator.next();
+//                    if (currentCell.getCellTypeEnum().equals(CellType.NUMERIC)) {
+//                        if (currentCell.getColumnIndex() == 0) {
+//                            charger.setCHARGING_POINT_ID((int) currentCell.getNumericCellValue());   //charger_id
+//                        }
+//                        if (currentCell.getColumnIndex() == 1) {
+//                             charger.setCHARGER_TYPE((int)currentCell.getNumericCellValue()); //charger_type
+//                        }
+//                    }
+//                }
+//                chargers.add(charger); //chargers_list
+//            }
+//        }
+
