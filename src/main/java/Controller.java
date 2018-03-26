@@ -3,27 +3,24 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jfree.ui.RefineryUtilities;
 import javax.swing.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 public class Controller {
-    List<Customer> customersRequests = new ArrayList<>();
+    static List<Customer> customersRequests = new ArrayList<>();
+    static List<Charger> chargers = new ArrayList<>();
+    static List<CustomerScheduledData>CUSTOMER_SCHEDULED,cs_ccs,cs_sc,chdm,last;
     List<Customer> customersRequestsfinal = new ArrayList<>();
     List<Customer>CUST_NISSAN=new ArrayList<>();
     List<Customer>CUST_CHEV=new ArrayList<>();
     List<Customer>CUST_TESLA=new ArrayList<>();
     List<Customer>teslaAndNissan=new ArrayList<>();
-    static List<Charger> chargers = new ArrayList<>();
     List<DataObjectEVCompatibility>EV_COMPATIBILITY_DEFAULT;
-    static List<CustomerScheduledData>CUSTOMER_SCHEDULED,cs_ccs,cs_sc,chdm,last;
     List<Charger>C_C_S,S_C,Chademo,level2;
     @FXML
     private Button getDataSet;
@@ -50,77 +47,8 @@ public class Controller {
     }
     public void processFile() throws IOException{
         FileInputStream fis = new FileInputStream(new File(filename));
-        Workbook workbook = new XSSFWorkbook(fis);
-        Sheet sheet = workbook.getSheetAt(0);   //read customers
-        Sheet Charger_Sheet = workbook.getSheetAt(1);  //read charger_name
-        Iterator<Row> CHARGER_Iterator = Charger_Sheet.iterator();
-        Iterator<Row> iterator = sheet.iterator();
-        //*******************************************Charger reading Start**********************************************
-        while (CHARGER_Iterator.hasNext()) {
-            Charger charger = new Charger();
-            Row currentRow = CHARGER_Iterator.next();
-            Iterator<Cell> cellIterator = currentRow.iterator();
-            if (currentRow.getRowNum() == 0) {
-            }
-            else {
-                while (cellIterator.hasNext()) {
-                    Cell currentCell = cellIterator.next();
-                    if (currentCell.getCellTypeEnum().equals(CellType.STRING)){}
-                    else if (currentCell.getCellTypeEnum().equals(CellType.NUMERIC)){
-                        if (currentCell.getColumnIndex() == 0) {
-                            charger.setC_P_Id((int) currentCell.getNumericCellValue());   //charger id
-                        }
-                        if(currentCell.getColumnIndex()==1){
-                            charger.setCh((int)currentCell.getNumericCellValue());
-                        }
-                    }
-                }
-                chargers.add(charger);
-            }
-        }
-    //***************************************************Charger reading Done*******************************************
-
-    //*************************************************Customer reading Start*******************************************
-        while (iterator.hasNext()) {
-            Customer customer = new Customer();
-            Row currentRow = iterator.next();
-            Iterator<Cell> cellIterator = currentRow.iterator();
-            if (currentRow.getRowNum() == 0) {
-            } else {
-                while (cellIterator.hasNext()) {
-                    Cell currentCell = cellIterator.next();
-                    if (currentCell.getCellTypeEnum().equals(CellType.STRING)) {
-                    } else if (currentCell.getCellTypeEnum().equals(CellType.NUMERIC)) {
-                        if (currentCell.getColumnIndex() == 0) {
-                            customer.setCustomer_Id((int) currentCell.getNumericCellValue());   //customer id
-                        }
-                        if (currentCell.getColumnIndex() == 3) {
-                            customer.setMiles((int)currentCell.getNumericCellValue()); //miles
-                        }
-                        if (currentCell.getColumnIndex() == 4) {
-
-                            customer.setEv_car((int)currentCell.getNumericCellValue()); //ev_car
-                        }
-                        if (DateUtil.isCellDateFormatted(currentCell)) {
-                            if (currentCell.getColumnIndex() == 1) {
-                                SimpleDateFormat sdf2=new SimpleDateFormat("HH:mm");
-                                LocalTime time = LocalTime.parse(sdf2.format(currentCell.getDateCellValue())); //starttime
-                                customer.setPrefer_Start_Time(time);
-                            }
-                            if (currentCell.getColumnIndex() == 2) {
-
-                                SimpleDateFormat formatTime = new SimpleDateFormat("HH:mm");
-                                customer.setPrefer_End_Time(LocalTime.parse(formatTime.format(currentCell.getDateCellValue())));//endtime
-                            }
-                        }
-                    }
-                }
-                customersRequests.add(customer);
-            }
-        //******************************************Customer reading Done***********************************************
-        }
+        readDataset.readFile(fis); //readfile
         defaultCompatibility(); //DEFAULT_COMPATABILITY
-
         //************************************Customer filtering based on EV-TYPE***************************************
         System.out.println("\n*******************Nissan EV's***********************");
         CUST_NISSAN = customersRequests.stream()
@@ -215,21 +143,46 @@ public class Controller {
 
         //************************************Reservation of Tesla and Nissan on Chademo********************************
         System.out.println("*****************List of Nissan and Tesla for Chdemo**************************************");
+        List<CustomerScheduledData>teslaNissanOnly;
         teslaAndNissan.addAll(CUST_TESLA);  //list of nissan and tesla
         teslaAndNissan.addAll(CUST_NISSAN);  //list of nissan and tesla
-        teslaAndNissan.sort(Comparator.comparing(Customer::getMiles).reversed().thenComparing(Customer::getPrefer_Start_Time));
+        teslaAndNissan.sort(Comparator.comparing(Customer::getMiles)
+                           .reversed()
+                           .thenComparing(Customer::getPrefer_Start_Time));
         teslaAndNissan.forEach(System.out::println);  //tesla and nissan for chademo
-        scheduleCustomerTeslaAndNissan(teslaAndNissan); //tesla nissan
-        customersRequestsfinal.removeAll(remove(chdm));  //tesla nissan
-        CUSTOMER_SCHEDULED.addAll(chdm); //tesla nissan
+        teslaNissanOnly=scheduleCustomerTeslaAndNissan(teslaAndNissan,0); //tesla nissan
+        teslaAndNissan.removeAll(teslaNissanOnly);
+        customersRequestsfinal.removeAll(remove(teslaNissanOnly));  //tesla nissan
+        CUSTOMER_SCHEDULED.addAll(teslaNissanOnly); //tesla nissan
+        Chademo.remove(0);
+        if(teslaAndNissan.size()>0 && Chademo.size()>0){
+            for(int i=0;i<C_C_S.size();i++) {
+                teslaNissanOnly = scheduleCustomerTeslaAndNissan(teslaAndNissan, i);
+                teslaAndNissan.removeAll(remove(teslaNissanOnly)); //remove assigned to SC
+                customersRequestsfinal.removeAll(remove(teslaNissanOnly));  //tesla only
+                CUSTOMER_SCHEDULED.addAll(teslaNissanOnly);   //add tesla SC
+            }
+        }
         //************************************Reservation of Tesla and Nissan on Chademo-Done***************************
 
         //************************************Reservation of Tesla,Nissan,Chev on Level2********************************
-        System.out.println("List for last");
+        System.out.println("***********************************List for last******************************************");
+        List<CustomerScheduledData>finalList;
         customersRequestsfinal.forEach(System.out::println);
-        scheduleCustomerTeslaNissanChev(customersRequestsfinal);
-        CUSTOMER_SCHEDULED.addAll(last);
-        customersRequestsfinal.removeAll(remove(last));
+        customersRequestsfinal.sort(Comparator.comparing(Customer::getMiles)
+                              .reversed()
+                              .thenComparing(Customer::getPrefer_Start_Time));
+        finalList=scheduleCustomerTeslaNissanChev(customersRequestsfinal,0);
+        CUSTOMER_SCHEDULED.addAll(finalList);
+        customersRequestsfinal.removeAll(remove(finalList));
+        level2.remove(0);
+        if(customersRequestsfinal.size()>0 && level2.size()>0){
+            for(int i=0;i<C_C_S.size();i++) {
+                finalList = scheduleCustomerTeslaNissanChev(customersRequestsfinal, i);
+                customersRequestsfinal.removeAll(remove(finalList));  //tesla only
+                CUSTOMER_SCHEDULED.addAll(finalList);   //add tesla SC
+            }
+        }
         //************************************Reservation of Tesla,Nissan,Chev on Level2-Done***************************
 
         System.out.println("\n\n******************Scheduled Customer Requests Are***********************");
@@ -290,39 +243,59 @@ public class Controller {
   //*******************************************Schedule Customer Tesla-Done*********************************************
 
   //*****************************************Schedule Customer Tesla $ Nissan*****************************************
-   private void scheduleCustomerTeslaAndNissan(List<Customer> customers){
+   private List<CustomerScheduledData> scheduleCustomerTeslaAndNissan(List<Customer> customers,int i){
       chdm=new ArrayList<>();
+       int projectedTotalMinutes;
       CustomerScheduledData scheduledCustomer;
       for(Customer customer:customers){
-          Charger chargerScheduled = getCharger_chademo(customer);
+          Charger chargerScheduled = getCharger_chademo(customer,Chademo.get(i));
           if(chargerScheduled!=null){
               scheduledCustomer=new CustomerScheduledData();
               scheduledCustomer.setCustomer_Id(customer.getCustomer_Id());
               scheduledCustomer.setPrefer_Start_Time(customer.getPrefer_Start_Time());
-              scheduledCustomer.setPrefer_Fin_Time(customer.getPrefer_End_Time());
+              if(customer.getCar_Type().equals(Customer.EV_CAR.NISSAN)) {
+                  projectedTotalMinutes = (int) ((int) customer.getMiles() /EV_COMPATIBILITY_DEFAULT.get(1).getMilePerminute());
+              }
+              else {
+                  projectedTotalMinutes =  (int) ((int) customer.getMiles() /EV_COMPATIBILITY_DEFAULT.get(5).getMilePerminute());
+              }
+              scheduledCustomer.setPrefer_Fin_Time(customer.getPrefer_Start_Time().plusMinutes(projectedTotalMinutes));
               scheduledCustomer.setAssigned_Charger(chargerScheduled);
               chdm.add(scheduledCustomer);
           }
       }
+      return chdm;
   }
   //*****************************************Schedule Customer Tesla $ Nissan Done**************************************
 
 
   //*****************************************Schedule Customer All Last***********************************************
-    private void scheduleCustomerTeslaNissanChev(List<Customer> customers){
+    private List<CustomerScheduledData>scheduleCustomerTeslaNissanChev(List<Customer> customers,int i){
         last=new ArrayList<>();
+        int projectedTotalMinutes=0;
         CustomerScheduledData scheduledCustomer;
         for(Customer customer:customers){
-            Charger chargerScheduled = getChargerlast(customer);
+            Charger chargerScheduled = getChargerlast(customer,level2.get(i));
             if(chargerScheduled!=null){
                 scheduledCustomer=new CustomerScheduledData();
                 scheduledCustomer.setCustomer_Id(customer.getCustomer_Id());
                 scheduledCustomer.setPrefer_Start_Time(customer.getPrefer_Start_Time());
-                scheduledCustomer.setPrefer_Fin_Time(customer.getPrefer_End_Time());
+                if(customer.getCar_Type().equals(Customer.EV_CAR.NISSAN)) {
+                    projectedTotalMinutes = (int) ((int) customer.getMiles() /EV_COMPATIBILITY_DEFAULT.get(0).getMilePerminute());
+                }
+                else if(customer.getCar_Type().equals(Customer.EV_CAR.CHEV)){
+                    projectedTotalMinutes =  (int) ((int) customer.getMiles() /EV_COMPATIBILITY_DEFAULT.get(2).getMilePerminute());
+                }
+                else if(customer.getCar_Type().equals(Customer.EV_CAR.TESLA)){
+                    projectedTotalMinutes =  (int) ((int) customer.getMiles() /EV_COMPATIBILITY_DEFAULT.get(4).getMilePerminute());
+
+                }
+                scheduledCustomer.setPrefer_Fin_Time(customer.getPrefer_Start_Time().plusMinutes(projectedTotalMinutes));
                 scheduledCustomer.setAssigned_Charger(chargerScheduled);
                 last.add(scheduledCustomer);
             }
         }
+        return last;
     }
     //*****************************************Schedule Customer All Last***********************************************
 
@@ -330,6 +303,7 @@ public class Controller {
     private Charger getCharger_CCS(Customer customer,Charger charger){
         Charger ch=null;
         LocalTime tmpStart = customer.getPrefer_Start_Time();
+        LocalTime tmpStartactual = customer.getPrefer_Start_Time();
         LocalTime tmpend = customer.getPrefer_End_Time();
         int projectedTotalMinutes= (int) ((int)customer.getMiles() /  EV_COMPATIBILITY_DEFAULT.get(3).getMilePerminute());
                 System.out.println("ID "+customer.getCustomer_Id()+" Car-Type "+customer.getCar_Type()+" Customer's minutes "+ customer.getTimeInMinutes());
@@ -355,23 +329,20 @@ public class Controller {
                                             +", C.ID: "+customer.getCustomer_Id()
                                             +"tmpStart: "+tmpStart+", tmpend: "+tmpend);
                                     if(tmpStart.isAfter(customer.getPrefer_Start_Time()) &&
-                                            tmpend.isBefore(customer.getPrefer_End_Time()))
-                                    {
+                                            tmpend.isBefore(customer.getPrefer_End_Time())){
                                         customer.setPrefer_Start_Time(tmpStart);
                                         ch = charger;
                                         isSpaceAvailable=false;
                                     }
-                                    else
-                                    {
-                                        if(ccs.getPrefer_Fin_Time().isAfter(projectedFinishTime))
-                                        {
-                                            return null;
-                                        }else if(customer.getPrefer_End_Time().isBefore(tmpend))
-                                        {
+                                    else{
+                                        customer.setPrefer_Start_Time(tmpStartactual);
+                                        if(ccs.getPrefer_Fin_Time().isAfter(projectedFinishTime)){
                                             return null;
                                         }
-                                        else
-                                        {
+                                        else if(customer.getPrefer_End_Time().isBefore(tmpend)){
+                                            return null;
+                                        }
+                                        else{
                                             isSpaceAvailable = true;
                                         }
                                     }
@@ -398,9 +369,10 @@ public class Controller {
         return  ch;
     }
 
-    //********************************************************Assign S_C-Tesla***************************************
+    //********************************************************Assign S_C-Tesla******************************************
     private Charger getCharger_SC(Customer customer, Charger charger){
         Charger ch=null;
+        LocalTime tmpStartactual = customer.getPrefer_Start_Time();
         LocalTime tmpStart = customer.getPrefer_Start_Time();
         LocalTime tmpend = customer.getPrefer_End_Time();
         if((EV_COMPATIBILITY_DEFAULT.get(6).getMilePerminute()*customer.getTimeInMinutes())>=customer.getMiles()){
@@ -439,17 +411,15 @@ public class Controller {
                                                         +", C.ID: "+customer.getCustomer_Id());
                                     ch = charger;
                                     isSpaceAvailable=false;
-                                }else
-                                {
-                                    if(c.getPrefer_Fin_Time().isAfter(projectedFinishTime))
-                                    {
+                                }
+                                else{
+                                    customer.setPrefer_Start_Time(tmpStartactual);
+                                    if(c.getPrefer_Fin_Time().isAfter(projectedFinishTime)){
                                         return null;
-                                    }else if(customer.getPrefer_End_Time().isBefore(tmpend))
-                                    {
+                                    }else if(customer.getPrefer_End_Time().isBefore(tmpend)){
                                         return null; // or false
                                     }
-                                    else
-                                    {
+                                    else{
                                         isSpaceAvailable = true;
                                     }
                                 }
@@ -480,32 +450,142 @@ public class Controller {
         return  ch;
         }
 
-   //***Intailize Default Chargers*****
-    private void defaultCompatibility() {
-        EV_COMPATIBILITY_DEFAULT = new ArrayList<>();
-        //***NISSAN****
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.NISSAN, Charger.charger_name.LVL_2, 0.37));
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.NISSAN, Charger.charger_name.CHDM, 1.22));
-        //***CHEV****
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.CHEV, Charger.charger_name.LVL_2, 0.40));
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.CHEV, Charger.charger_name.C_C_S, 2.17));
-        //***TESLA****
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA, Charger.charger_name.LVL_2, 0.42));
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA, Charger.charger_name.CHDM, 1.42));
-        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA, Charger.charger_name.S_C, 2.67));
-
+    //*********************************************Assign Chademo Nissan-Tesla******************************************
+    private Charger getCharger_chademo(Customer customer,Charger charger){
+        Charger ch=null;
+        LocalTime tmpStart = customer.getPrefer_Start_Time();
+        LocalTime tmpend = customer.getPrefer_End_Time();
+        LocalTime tmpStartactual = customer.getPrefer_Start_Time();
+        int projectedTotalMinutes;
+            if(customer.getCar_Type().equals(Customer.EV_CAR.NISSAN)) {
+                projectedTotalMinutes = (int) ((int) customer.getMiles() /EV_COMPATIBILITY_DEFAULT.get(1).getMilePerminute());
+            }
+            else {
+                projectedTotalMinutes =  (int) ((int) customer.getMiles() /EV_COMPATIBILITY_DEFAULT.get(5).getMilePerminute());
+            }
+            if(customer.getTimeInMinutes()>=projectedTotalMinutes) {
+                System.out.println("ID " + customer.getCustomer_Id() + " Car-Type "
+                        + customer.getCar_Type() + " Customer's minutes " + customer.getTimeInMinutes());
+                System.out.println("Projected Minutes " + projectedTotalMinutes);
+                LocalTime projectedFinishTime = customer.getPrefer_Start_Time().plusMinutes(projectedTotalMinutes);
+                tmpend = projectedFinishTime;
+                System.out.println("Projected Finish Times is " + projectedFinishTime + " With Charger " + Charger.charger_name.CHDM);
+                boolean isSpaceAvailable = true;
+                boolean islistempty = true;
+                for (CustomerScheduledData c : chdm) {
+                    islistempty = false;
+                    if (c.getAssigned_Charger().equals(charger)) {
+                        if (c.getPrefer_Fin_Time().isBefore(customer.getPrefer_End_Time()) ||
+                                c.getPrefer_Fin_Time().equals(customer.getPrefer_End_Time())) {
+                            tmpStart = c.getPrefer_Fin_Time().plusMinutes(1);
+                            tmpend = tmpStart.plusMinutes(projectedTotalMinutes);
+                            if (tmpStart.isAfter(customer.getPrefer_Start_Time()) &&
+                                    tmpend.isBefore(customer.getPrefer_End_Time())) {
+                                customer.setPrefer_Start_Time(tmpStart);
+                                ch = charger;
+                                isSpaceAvailable = false;
+                            } else {
+                                customer.setPrefer_Start_Time(tmpStartactual);
+                                if (c.getPrefer_Fin_Time().isAfter(projectedFinishTime)) {
+                                    //customer.setPrefer_Start_Time(tmpStartactual);
+                                    return null;
+                                } else if (customer.getPrefer_End_Time().isBefore(tmpend)) {
+                                    return null;
+                                } else {
+                                    isSpaceAvailable = true;
+                                }
+                            }
+                        } else if (projectedFinishTime.isBefore(c.Prefer_Start_Time)) {
+                            tmpStart = c.getPrefer_Fin_Time().plusMinutes(1);
+                            customer.setPrefer_Start_Time(tmpStart);
+                            ch = charger;
+                        }
+                    }
+                }
+                if (isSpaceAvailable) {
+                    customer.setPrefer_End_Time(projectedFinishTime);
+                    return charger;
+                }
+                if (islistempty) {
+                    System.out.println("ID stag 4: " + customer.getCustomer_Id());
+                    return charger;
+                }
+            }
+         return  ch;
     }
-    public static Charger getChargerById(int chargerid){
-        Charger charger = null;
-        for(Charger ch: chargers){
-            if(chargerid==ch.getC_P_Id()){
-                charger=ch;
+
+    //*********************************************Assign Chademo Nissan-Tesla-Done*************************************
+
+    //*********************************************Assign Level2 Nissan-Tesla Chev**************************************
+    private Charger getChargerlast(Customer customer,Charger charger){
+        Charger ch=null;
+        LocalTime tmpStartactual = customer.getPrefer_Start_Time();
+        LocalTime tmpStart = customer.getPrefer_Start_Time();
+        LocalTime tmpend = customer.getPrefer_End_Time();
+        int projectedTotalMinutes=0;
+                switch (customer.getCar_Type()) {
+                case NISSAN:
+                    projectedTotalMinutes = (int) ((int) customer.getMiles() / EV_COMPATIBILITY_DEFAULT.get(0).getMilePerminute());
+                    break;
+                case TESLA:
+                    projectedTotalMinutes = (int) ((int) customer.getMiles() / EV_COMPATIBILITY_DEFAULT.get(4).getMilePerminute());
+                    break;
+                case CHEV:
+                    projectedTotalMinutes = (int) ((int) customer.getMiles() / EV_COMPATIBILITY_DEFAULT.get(2).getMilePerminute());
+                    break;
+
+            }
+        if(customer.getTimeInMinutes()>=projectedTotalMinutes) {
+            System.out.println("ID " + customer.getCustomer_Id() + " Car-Type " + customer.getCar_Type() + " Customer's minutes " + customer.getTimeInMinutes());
+            System.out.println("Projected Minutes " + projectedTotalMinutes);
+            LocalTime projectedFinishTime = customer.getPrefer_Start_Time().plusMinutes(projectedTotalMinutes);
+            tmpend = projectedFinishTime;
+            System.out.println("Projected Finish Times is " + projectedFinishTime + " With Charger " + Charger.charger_name.LVL_2);
+            boolean isSpaceAvailable = true;
+            boolean islistempty = true;
+            for (CustomerScheduledData c : last) {
+                islistempty = false;
+                if (c.getAssigned_Charger().equals(charger)) {
+                    if (c.getPrefer_Fin_Time().isBefore(customer.getPrefer_End_Time()) ||
+                            c.getPrefer_Fin_Time().equals(customer.getPrefer_End_Time())) {
+                        tmpStart = c.getPrefer_Fin_Time().plusMinutes(1);
+                        tmpend = tmpStart.plusMinutes(projectedTotalMinutes);
+                        if (tmpStart.isAfter(customer.getPrefer_Start_Time()) &&
+                                tmpend.isBefore(customer.getPrefer_End_Time())) {
+                            customer.setPrefer_Start_Time(tmpStart);
+                            ch = charger;
+                            isSpaceAvailable = false;
+                        } else {
+                            customer.setPrefer_Start_Time(tmpStartactual);
+                            if (c.getPrefer_Fin_Time().isAfter(projectedFinishTime)) {
+                                return null;
+                            } else if (customer.getPrefer_End_Time().isBefore(tmpend)) {
+                                return null;
+                            } else {
+                                isSpaceAvailable = true;
+                            }
+                        }
+                    } else if (projectedFinishTime.isBefore(c.Prefer_Start_Time)) {
+                        tmpStart = c.getPrefer_Fin_Time().plusMinutes(1);
+                        customer.setPrefer_Start_Time(tmpStart);
+                        ch = charger;
+                    }
+                }
+            }
+            if (isSpaceAvailable) {
+                customer.setPrefer_End_Time(projectedFinishTime);
+                return charger;
+            }
+            if (islistempty) {
+                System.out.println("ID stag 4: " + customer.getCustomer_Id());
+                return charger;
             }
         }
-            return charger;
+         return  ch;
     }
+    //*********************************************Assign Level2 Nissan-Tesla Chev-Done*********************************
 
-    //remove from initial list
+    //***************************************Remove from initial list***************************************************
     private List<Customer> remove(List<CustomerScheduledData> csd){
         List<Customer>after_remove=new ArrayList<>();
         if(csd.size()>0){
@@ -520,102 +600,34 @@ public class Controller {
         }
         return after_remove;
     }
-
-    private Charger getCharger_chademo(Customer customer){
-        Charger ch=null;
-        DataObjectEVCompatibility d1=EV_COMPATIBILITY_DEFAULT.stream()
-                .filter(ev->ev.getCharging_Point_Name()
-                        .equals(Charger.charger_name.CHDM))
-                .findAny().orElse(null);
-        if(d1.getCar_Type().equals(customer.getCar_Type())
-                && (d1.getMilePerminute()*customer.getTimeInMinutes())>=customer.getMiles()
-                ){
-            int projectedTotalMinutes= (int) ((int)customer.getMiles() / d1.getMilePerminute());
-            //  int totalMinutes = customer.getPrefer_Start_Time().plusMinutes(projectedTotalMinutes);
-            System.out.println("ID "+customer.getCustomer_Id()+" Car-Type "+customer.getCar_Type()+" Customer's minutes "+ customer.getTimeInMinutes());
-            System.out.println("Projected Minutes "+ projectedTotalMinutes);
-            LocalTime projectedFinishTime = customer.getPrefer_Start_Time().plusMinutes(projectedTotalMinutes);
-            System.out.println("Projected Finish Times is "+projectedFinishTime + " With Charger "+d1.getCharging_Point_Name());
-            for (Charger charger : Chademo) {
-                if (charger.getCh().equals(d1.getCharging_Point_Name())) {
-                    boolean isSpaceAvailable = true;
-                    for (CustomerScheduledData c : chdm) {
-                        if (c.getAssigned_Charger().equals(charger)) {
-                            if ((c.getPrefer_Fin_Time().isAfter(customer.getPrefer_Start_Time()))
-                                    && c.getPrefer_Fin_Time().isBefore(customer.getPrefer_End_Time())) {
-                                if((c.getPrefer_Fin_Time().plusMinutes(projectedTotalMinutes)).isBefore(customer.getPrefer_End_Time())){
-                                    customer.setPrefer_Start_Time(c.getPrefer_Fin_Time().plusMinutes(1));
-                                    customer.setPrefer_End_Time(customer.getPrefer_Start_Time().plusMinutes(projectedTotalMinutes));
-                                    return charger;
-                                }
-                                else{
-                                    isSpaceAvailable=false;
-                                }
-                                //isSpaceAvailable = false;
-                            } else if (projectedFinishTime.isBefore(c.Prefer_Start_Time)) {
-                                customer.setPrefer_End_Time(projectedFinishTime);
-                                return charger;
-                            }
-
-                        }
-                    }
-                    if (isSpaceAvailable) {
-                        customer.setPrefer_End_Time(projectedFinishTime);
-                        return charger;
-                    }
-
-                }
+    //********************************************************Intailize Default Chargers********************************
+    private void defaultCompatibility() {
+        EV_COMPATIBILITY_DEFAULT = new ArrayList<>();
+        //***NISSAN****
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.NISSAN,
+                                                                   Charger.charger_name.LVL_2, 0.37));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.NISSAN,
+                                                                   Charger.charger_name.CHDM, 1.22));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.CHEV,
+                                                                   Charger.charger_name.LVL_2, 0.40));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.CHEV,
+                                                                   Charger.charger_name.C_C_S, 2.17));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA,
+                                                                   Charger.charger_name.LVL_2, 0.42));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA,
+                                                                   Charger.charger_name.CHDM, 1.42));
+        EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.TESLA,
+                                                                    Charger.charger_name.S_C, 2.67));
+    }
+    //********************************************************Intailize Default Chargers********************************
+    public static Charger getChargerById(int chargerid){
+        Charger charger = null;
+        for(Charger ch: chargers){
+            if(chargerid==ch.getC_P_Id()){
+                charger=ch;
             }
         }
-        return  ch;
+        return charger;
     }
-
-    private Charger getChargerlast(Customer customer){
-        Charger ch=null;
-        DataObjectEVCompatibility d1=EV_COMPATIBILITY_DEFAULT.stream()
-                .filter(ev->ev.getCharging_Point_Name()
-                        .equals(Charger.charger_name.LVL_2))
-                .findAny().orElse(null);
-        if(d1.getCar_Type().equals(customer.getCar_Type())
-                && (d1.getMilePerminute()*customer.getTimeInMinutes())>=customer.getMiles()
-                ){
-            int projectedTotalMinutes= (int) ((int)customer.getMiles() / d1.getMilePerminute());
-            System.out.println("ID "+customer.getCustomer_Id()+" Car-Type "+customer.getCar_Type()+" Customer's minutes "+ customer.getTimeInMinutes());
-            System.out.println("Projected Minutes "+ projectedTotalMinutes);
-            LocalTime projectedFinishTime = customer.getPrefer_Start_Time().plusMinutes(projectedTotalMinutes);
-            System.out.println("Projected Finish Times is "+projectedFinishTime + " With Charger "+d1.getCharging_Point_Name());
-            for (Charger charger : level2) {
-                if (charger.getCh().equals(d1.getCharging_Point_Name())) {
-                    boolean isSpaceAvailable = true;
-                    for (CustomerScheduledData c : last) {
-                        if (c.getAssigned_Charger().equals(charger)) {
-                            if ((c.getPrefer_Fin_Time().isAfter(customer.getPrefer_Start_Time()))
-                                    && c.getPrefer_Fin_Time().isBefore(customer.getPrefer_End_Time())) {
-                                if((c.getPrefer_Fin_Time().plusMinutes(projectedTotalMinutes)).isBefore(customer.getPrefer_End_Time())){
-                                    customer.setPrefer_Start_Time(c.getPrefer_Fin_Time().plusMinutes(1));
-                                    customer.setPrefer_End_Time(customer.getPrefer_Start_Time().plusMinutes(projectedTotalMinutes));
-                                    return charger;
-                                }
-                                else{
-                                    isSpaceAvailable=false;
-                                }
-
-                            } else if (projectedFinishTime.isBefore(c.Prefer_Start_Time)) {
-                                customer.setPrefer_End_Time(projectedFinishTime);
-                                return charger;
-                            }
-
-                        }
-                    }
-                    if (isSpaceAvailable) {
-                        customer.setPrefer_End_Time(projectedFinishTime);
-                        return charger;
-                    }
-
-                }
-            }
-        }
-        return  ch;
-    }
-
 }
+
