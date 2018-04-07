@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 public class WriteExcelFileExample {
-    private static final String FILE_PATH = "D:\\play-java-starter-example\\EV\\scheduleData.xlsx";
+    private static final String FILE_PATH = "D:\\EV\\scheduleData.xlsx";
     static List<CustomerScheduledData> output = new ArrayList();
     //We are making use of a single instance to prevent multiple write access to same file.
     private static final WriteExcelFileExample INSTANCE = new WriteExcelFileExample();
