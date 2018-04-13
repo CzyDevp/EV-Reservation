@@ -63,7 +63,7 @@ public class GanttChartView extends JFrame {
 								  .getC_P_Id()==Character.digit(main.getDescription().charAt(0),Character.MAX_RADIX))
 						.forEach(customerScheduledData -> {
 							getDates(customerScheduledData.getPrefer_Start_Time(),customerScheduledData.getPrefer_Fin_Time());
-							System.out.println("Starthere "+ start_Time + " endhere "+end_Time);
+							//System.out.println("Starthere "+ start_Time + " endhere "+end_Time);
 							main.addSubtask(new Task(
 									String.format("%s: %s", customerScheduledData.getAssigned_Charger().C_P_Id,
 											customerScheduledData.getAssigned_Charger().getCh()
@@ -110,6 +110,6 @@ public class GanttChartView extends JFrame {
 				 MonthDay.now().getDayOfMonth())).
 				 atZone(ZoneId.systemDefault()).toInstant();
 		 end_Time = Date.from(instant_last);
-		System.out.println("Start is "+ start_Time + " end is "+end_Time);
+		//System.out.println("Start is "+ start_Time + " end is "+end_Time);
 	 }
 }
