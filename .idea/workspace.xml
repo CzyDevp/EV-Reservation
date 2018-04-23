@@ -2,29 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="10158670-5b4c-475e-8de5-0a7d9a8452c4" name="Default" comment="">
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__junit_junit_4_11.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_hamcrest_hamcrest_core_1_3.xml" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/test/java/ControllerTest.java" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/test/java/CustomerScheduledDataTest.java" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/test/java/CustomerTest.java" />
-      <change beforePath="" afterPath="$PROJECT_DIR$/src/test/java/readDatasetTest.java" />
-      <change beforePath="$PROJECT_DIR$/.idea/libraries/Maven__org_testng_testng_6_14_2.xml" afterPath="$PROJECT_DIR$/.idea/libraries/Maven__org_testng_testng_6_14_3.xml" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/Docs/sqap_40014477.pdf" />
+      <change beforePath="" afterPath="$PROJECT_DIR$/data_final_2.xlsx" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/Docs/INSE 6260-System Design Specification (Template).docx" afterPath="$PROJECT_DIR$/Docs/INSE 6260-System Design Specification (Template).docx" />
-      <change beforePath="$PROJECT_DIR$/Docs/final-ppt-project.pptx" afterPath="$PROJECT_DIR$/Docs/final-ppt-project.pptx" />
-      <change beforePath="$PROJECT_DIR$/EV.iml" afterPath="$PROJECT_DIR$/EV.iml" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change beforePath="$PROJECT_DIR$/scheduleData.xlsx" afterPath="$PROJECT_DIR$/scheduleData.xlsx" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Controller.java" afterPath="$PROJECT_DIR$/src/main/java/Controller.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/MyToolTipGenerator.java" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/WriteExcelFileExample.java" afterPath="$PROJECT_DIR$/src/main/java/WriteExcelFileExample.java" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/readDataset.java" afterPath="$PROJECT_DIR$/src/main/java/readDataset.java" />
-      <change beforePath="$PROJECT_DIR$/src/model/Charger.java" afterPath="$PROJECT_DIR$/src/model/Charger.java" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Controller$1.class" afterPath="$PROJECT_DIR$/target/classes/Controller$1.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/Controller.class" afterPath="$PROJECT_DIR$/target/classes/Controller.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/MyToolTipGenerator.class" afterPath="" />
-      <change beforePath="$PROJECT_DIR$/target/classes/WriteExcelFileExample.class" afterPath="$PROJECT_DIR$/target/classes/WriteExcelFileExample.class" />
-      <change beforePath="$PROJECT_DIR$/target/classes/readDataset.class" afterPath="$PROJECT_DIR$/target/classes/readDataset.class" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Charger.class" afterPath="$PROJECT_DIR$/target/classes/Charger.class" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -601,7 +582,7 @@
       <workItem from="1523125990108" duration="612000" />
       <workItem from="1523625116803" duration="1985000" />
       <workItem from="1523644725327" duration="6108000" />
-      <workItem from="1524506191702" duration="5996000" />
+      <workItem from="1524506191702" duration="6222000" />
     </task>
     <task id="LOCAL-00001" summary="Documentation based on Waterfall development lifecycle added.&#10;UML and Gantt chart added for better understanding, estimation, and tracking">
       <created>1520801248458</created>
@@ -687,7 +668,21 @@
       <option name="project" value="LOCAL" />
       <updated>1523628037701</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="testing Done!!&#10;junit4 used">
+      <created>1524512250656</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1524512250656</updated>
+    </task>
+    <task id="LOCAL-00014" summary="dataset added">
+      <created>1524512421803</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1524512421803</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -723,7 +718,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="239859000" />
+    <option name="totallyTimeSpent" value="240085000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -743,7 +738,7 @@
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32986626" sideWeight="0.5087848" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.24" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.58153844" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4846154" sideWeight="0.49121523" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Coverage" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32930514" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3276923" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
@@ -809,7 +804,9 @@
     <MESSAGE value="little bug fix Optimization Done!!" />
     <MESSAGE value="bug resolved related to collision" />
     <MESSAGE value="final presentation done!!" />
-    <option name="LAST_COMMIT_MESSAGE" value="final presentation done!!" />
+    <MESSAGE value="testing Done!!&#10;junit4 used" />
+    <MESSAGE value="dataset added" />
+    <option name="LAST_COMMIT_MESSAGE" value="dataset added" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
