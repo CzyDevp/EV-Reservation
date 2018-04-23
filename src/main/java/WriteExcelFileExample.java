@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 public class WriteExcelFileExample {
     private static final String FILE_PATH = "D:\\EV\\scheduleData.xlsx";
-    static List<CustomerScheduledData> output = new ArrayList();
+    //static List<CustomerScheduledData> output = new ArrayList();
     //We are making use of a single instance to prevent multiple write access to same file.
     private static final WriteExcelFileExample INSTANCE = new WriteExcelFileExample();
     public static WriteExcelFileExample getInstance() {
@@ -47,7 +47,6 @@ public class WriteExcelFileExample {
             FileOutputStream fos = new FileOutputStream(FILE_PATH);
             workbook.write(fos);
             fos.flush();
-
             fos.close();
             System.out.println(FILE_PATH + " is successfully written");
         } catch (FileNotFoundException e) {

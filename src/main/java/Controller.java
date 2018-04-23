@@ -33,7 +33,7 @@ public class Controller {
         File file = fileChooser.showOpenDialog(null);
         if (file != null) {
             filename = file.toString();
-            System.out.println(file);
+            System.out.println("file is "+file);
             processFile();
             Stage stage = (Stage) getDataSet.getScene().getWindow();
             stage.close();
@@ -110,38 +110,44 @@ public class Controller {
         //************************************Charger filtering based on TYPE-Done**************************************
 
         //************************************Reservation of Tesla on SuperCharger**************************************
-            CUSTOMER_SCHEDULED=new ArrayList<>();
-            List<CustomerScheduledData> tesla_only_sc;
-            tesla_only_sc= scheduleCustomerTesla(CUST_TESLA,0); //schedule first here Tesla
-            CUST_TESLA.removeAll(remove(tesla_only_sc)); //remove assigned to SC
-            customersRequestsfinal.removeAll(remove(tesla_only_sc));  //tesla only
-            CUSTOMER_SCHEDULED.addAll(tesla_only_sc);   //add tesla SC
-            S_C.remove(0);
-            if(CUST_TESLA.size()>0 && S_C.size()>0){
-                for(int i=0;i<S_C.size();i++) {
+
+              CUSTOMER_SCHEDULED = new ArrayList<>();
+              if(S_C.size()>0) {
+              List<CustomerScheduledData> tesla_only_sc = new ArrayList<>();
+              //List<Customer>failme = new ArrayList<>();
+              tesla_only_sc = scheduleCustomerTesla(CUST_TESLA, 0); //schedule first here Tesla
+              CUST_TESLA.removeAll(remove(tesla_only_sc)); //remove assigned to SC
+              customersRequestsfinal.removeAll(remove(tesla_only_sc));  //tesla only
+              CUSTOMER_SCHEDULED.addAll(tesla_only_sc);   //add tesla SC
+              S_C.remove(0);
+              if (CUST_TESLA.size() > 0 && S_C.size() > 0) {
+                  for (int i = 0; i < S_C.size(); i++) {
                       tesla_only_sc = scheduleCustomerTesla(CUST_TESLA, i);
                       CUST_TESLA.removeAll(remove(tesla_only_sc)); //remove assigned to SC
                       customersRequestsfinal.removeAll(remove(tesla_only_sc));  //tesla only
                       CUSTOMER_SCHEDULED.addAll(tesla_only_sc);   //add tesla SC
-                }
-            }
+                  }
+              }
+          }
         System.out.println("Left Tesla after S_C "+CUST_TESLA.size());
        // System.out.println(CUST_TESLA.size());
         //************************************Reservation of Tesla on SuperCharger-Done*********************************
 
         //************************************Reservation of Chev on Combo-Super-Charger*****************************
-        List<CustomerScheduledData>chev_only;
-        chev_only=scheduleCustomerChev(CUST_CHEV,0); //schedule Chev here first
-        CUST_CHEV.removeAll(remove(chev_only)); //remove assigned to CCS
-        customersRequestsfinal.removeAll(remove(chev_only)); //chev only
-        CUSTOMER_SCHEDULED.addAll(chev_only);  //add chev CCS
-        C_C_S.remove(0);
-        if(CUST_CHEV.size()>0 && C_C_S.size()>0){
-            for(int i=0;i<C_C_S.size();i++) {
-                chev_only = scheduleCustomerChev(CUST_CHEV, i);
-                CUST_CHEV.removeAll(remove(chev_only)); //remove assigned to CCS
-                customersRequestsfinal.removeAll(remove(chev_only));  //tesla only
-                CUSTOMER_SCHEDULED.addAll(chev_only);   //add tesla SC
+        if(C_C_S.size()>0) {
+            List<CustomerScheduledData> chev_only=new ArrayList<>();
+            chev_only = scheduleCustomerChev(CUST_CHEV, 0); //schedule Chev here first
+            CUST_CHEV.removeAll(remove(chev_only)); //remove assigned to CCS
+            customersRequestsfinal.removeAll(remove(chev_only)); //chev only
+            CUSTOMER_SCHEDULED.addAll(chev_only);  //add chev CCS
+            C_C_S.remove(0);
+            if (CUST_CHEV.size() > 0 && C_C_S.size() > 0) {
+                for (int i = 0; i < C_C_S.size(); i++) {
+                    chev_only = scheduleCustomerChev(CUST_CHEV, i);
+                    CUST_CHEV.removeAll(remove(chev_only)); //remove assigned to CCS
+                    customersRequestsfinal.removeAll(remove(chev_only));  //tesla only
+                    CUSTOMER_SCHEDULED.addAll(chev_only);   //add tesla SC
+                }
             }
         }
         System.out.println("Left Chev after C_C_S " +CUST_CHEV.size() );
@@ -151,23 +157,25 @@ public class Controller {
 
         //************************************Reservation of Tesla and Nissan on Chademo********************************
         System.out.println("*****************List of Nissan and Tesla for Chdemo**************************************");
-        List<CustomerScheduledData>teslaNissanOnly;
-        teslaAndNissan.addAll(CUST_TESLA);  //list of nissan and tesla
-        teslaAndNissan.addAll(CUST_NISSAN);  //list of nissan and tesla
-        teslaAndNissan.sort(Comparator.comparing(Customer::getMiles).reversed().thenComparing(Customer::getPrefer_Start_Time));
-        //teslaAndNissan.forEach(System.out::println);  //tesla and nissan for chademo
-        System.out.println(teslaAndNissan.size());
-        teslaNissanOnly=scheduleCustomerTeslaAndNissan(teslaAndNissan,0); //tesla nissan
-        teslaAndNissan.removeAll(remove(teslaNissanOnly));
-        customersRequestsfinal.removeAll(remove(teslaNissanOnly));  //tesla nissan
-        CUSTOMER_SCHEDULED.addAll(teslaNissanOnly); //tesla nissan
-        Chademo.remove(0);
-        if(teslaAndNissan.size()>0 && Chademo.size()>0){
-            for(int i=0;i<Chademo.size();i++) {
-                teslaNissanOnly = scheduleCustomerTeslaAndNissan(teslaAndNissan, i);
-                teslaAndNissan.removeAll(remove(teslaNissanOnly)); //remove assigned to SC
-                customersRequestsfinal.removeAll(remove(teslaNissanOnly));  //tesla only
-                CUSTOMER_SCHEDULED.addAll(teslaNissanOnly);   //add tesla SC
+        if(Chademo.size()>0) {
+            List<CustomerScheduledData> teslaNissanOnly = new ArrayList<>();
+            teslaAndNissan.addAll(CUST_TESLA);  //list of nissan and tesla
+            teslaAndNissan.addAll(CUST_NISSAN);  //list of nissan and tesla
+            teslaAndNissan.sort(Comparator.comparing(Customer::getMiles).reversed().thenComparing(Customer::getPrefer_Start_Time));
+            //teslaAndNissan.forEach(System.out::println);  //tesla and nissan for chademo
+            System.out.println(teslaAndNissan.size());
+            teslaNissanOnly = scheduleCustomerTeslaAndNissan(teslaAndNissan, 0); //tesla nissan
+            teslaAndNissan.removeAll(remove(teslaNissanOnly));
+            customersRequestsfinal.removeAll(remove(teslaNissanOnly));  //tesla nissan
+            CUSTOMER_SCHEDULED.addAll(teslaNissanOnly); //tesla nissan
+            Chademo.remove(0);
+            if (teslaAndNissan.size() > 0 && Chademo.size() > 0) {
+                for (int i = 0; i < Chademo.size(); i++) {
+                    teslaNissanOnly = scheduleCustomerTeslaAndNissan(teslaAndNissan, i);
+                    teslaAndNissan.removeAll(remove(teslaNissanOnly)); //remove assigned to SC
+                    customersRequestsfinal.removeAll(remove(teslaNissanOnly));  //tesla only
+                    CUSTOMER_SCHEDULED.addAll(teslaNissanOnly);   //add tesla SC
+                }
             }
         }
         System.out.println("Left TeslaNissan after Chademo " +teslaAndNissan.size());
@@ -176,21 +184,23 @@ public class Controller {
 
         //************************************Reservation of Tesla,Nissan,Chev on Level2********************************
         System.out.println("***********************************List for last******************************************");
-       List<CustomerScheduledData>finalList;
-       // customersRequestsfinal.forEach(System.out::println);
-        System.out.println(customersRequestsfinal.size());
-        customersRequestsfinal.sort(Comparator.comparing(Customer::getMiles)
-                              .reversed()
-                              .thenComparing(Customer::getPrefer_Start_Time));
-        finalList=scheduleCustomerTeslaNissanChev(customersRequestsfinal,0);
-        CUSTOMER_SCHEDULED.addAll(finalList);
-        customersRequestsfinal.removeAll(remove(finalList));
-        level2.remove(0);
-        if(customersRequestsfinal.size()>0 && level2.size()>0){
-            for(int i=0;i<level2.size();i++) {
-                finalList = scheduleCustomerTeslaNissanChev(customersRequestsfinal, i);
-                customersRequestsfinal.removeAll(remove(finalList));  //tesla only
-                CUSTOMER_SCHEDULED.addAll(finalList);   //add tesla SC
+        if(level2.size()>0) {
+            List<CustomerScheduledData> finalList = new ArrayList<>();
+            // customersRequestsfinal.forEach(System.out::println);
+            System.out.println(customersRequestsfinal.size());
+            customersRequestsfinal.sort(Comparator.comparing(Customer::getMiles)
+                    .reversed()
+                    .thenComparing(Customer::getPrefer_Start_Time));
+            finalList = scheduleCustomerTeslaNissanChev(customersRequestsfinal, 0);
+            CUSTOMER_SCHEDULED.addAll(finalList);
+            customersRequestsfinal.removeAll(remove(finalList));
+            level2.remove(0);
+            if (customersRequestsfinal.size() > 0 && level2.size() > 0) {
+                for (int i = 0; i < level2.size(); i++) {
+                    finalList = scheduleCustomerTeslaNissanChev(customersRequestsfinal, i);
+                    customersRequestsfinal.removeAll(remove(finalList));  //tesla only
+                    CUSTOMER_SCHEDULED.addAll(finalList);   //add tesla SC
+                }
             }
         }
         //************************************Reservation of Tesla,Nissan,Chev on Level2-Done***************************
@@ -333,7 +343,7 @@ public class Controller {
     //*****************************************Schedule Customer All Last***********************************************
 
     //**ASSIGN CHEV TO C_C_S******
-    private Charger getCharger_CCS(Customer customer,Charger charger){
+    public Charger getCharger_CCS(Customer customer,Charger charger){
         Charger ch=null;
         LocalTime tmpStart = customer.getPrefer_Start_Time();
         LocalTime tmpStartactual = customer.getPrefer_Start_Time();
@@ -395,7 +405,7 @@ public class Controller {
     }
 
     //********************************************************Assign S_C-Tesla******************************************
-    private Charger getCharger_SC(Customer customer, Charger charger){
+    public  Charger getCharger_SC(Customer customer, Charger charger){
         Charger ch=null;
         LocalTime tmpStartactual = customer.getPrefer_Start_Time();
         LocalTime tmpStart = customer.getPrefer_Start_Time();
@@ -465,7 +475,7 @@ public class Controller {
         }
 
     //*********************************************Assign Chademo Nissan-Tesla******************************************
-    private Charger getCharger_chademo(Customer customer,Charger charger){
+    public Charger getCharger_chademo(Customer customer,Charger charger){
         Charger ch=null;
         LocalTime tmpStart = customer.getPrefer_Start_Time();
         LocalTime tmpend = customer.getPrefer_End_Time();
@@ -533,7 +543,7 @@ public class Controller {
     //*********************************************Assign Chademo Nissan-Tesla-Done*************************************
 
     //*********************************************Assign Level2 Nissan-Tesla Chev**************************************
-    private Charger getChargerlast(Customer customer,Charger charger){
+    public Charger getChargerlast(Customer customer,Charger charger){
         Charger ch=null;
         LocalTime tmpStartactual = customer.getPrefer_Start_Time();
         LocalTime tmpStart = customer.getPrefer_Start_Time();
@@ -624,7 +634,7 @@ public class Controller {
         return after_remove;
     }
     //********************************************************Intailize Default Chargers********************************
-    private void defaultCompatibility() {
+    public void defaultCompatibility() {
         EV_COMPATIBILITY_DEFAULT = new ArrayList<>();
         //***NISSAN****
         EV_COMPATIBILITY_DEFAULT.add(new DataObjectEVCompatibility(Customer.EV_CAR.NISSAN,

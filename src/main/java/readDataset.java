@@ -47,7 +47,8 @@ public class readDataset {
                 while (cellIterator.hasNext()) {
                     Cell currentCell = cellIterator.next();
                     if (currentCell.getCellTypeEnum().equals(CellType.STRING)) {
-                    } else if (currentCell.getCellTypeEnum().equals(CellType.NUMERIC)) {
+                    }
+                    else if (currentCell.getCellTypeEnum().equals(CellType.NUMERIC)) {
                         if (currentCell.getColumnIndex() == 0) {
                             customer.setCustomer_Id((int) currentCell.getNumericCellValue());   //customer id
                         }

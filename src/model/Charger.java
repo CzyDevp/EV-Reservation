@@ -31,6 +31,21 @@ public class Charger {
     enum charger_name {
         LVL_2, S_C, CHDM, C_C_S;
     }
+
+    @Override
+    public int hashCode() {
+        return 5;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Charger ch = (Charger)obj;
+        if(ch.getC_P_Id()==this.getC_P_Id()){
+        return true;}
+        return  false;
+
+    }
+
     @Override
     public String toString() {
 
